@@ -7,39 +7,14 @@ class PasswordValidator:
 
     def __init__(self):
 
-        """Инициализация с компиляцией регулярных выражений."""
+        """ Регулярное выражение для проверки надежности пароля
+        Требует: минимум 8 символов, хотя бы одну строчную букву, заглавную букву, цифру и специальный символ"""
 
-        self.strong_password_regex = re.compile(
-            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&+#_])[A-Za-z\d@$!%*?&+#_]{8,}$'
-        )
+        self.strong_password_regex = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&+#_])[A-Za-z\d@$!%*?&+#_]{8,}$')
 
         self.potential_password_regex = re.compile(r'[A-Za-z\d@$!%*?&+#_]{8,}')
 
-
-    def validate_password(self, password: str):
-
-        """Проверяет пароль на надежность."""
-
-        errors = []
-
-        if len(password) < 8:
-            errors.append("Минимум 8 символов")
-
-        if not re.search(r'[a-z]', password):
-            errors.append("Минимум 1 строчная буква")
-
-        if not re.search(r'[A-Z]', password):
-            errors.append("Минимум 1 заглавная буква")
-
-        if not re.search(r'\d', password):
-            errors.append("Минимум 1 цифра")
-
-        if not re.search(r'[@$!%*?&+#_]', password):
-            errors.append("Минимум 1 специальный символ")
-
-        return len(errors) == 0, errors
-
-    def is_strong_password(self, password: str) -> bool:
+    def validate_password(self, password: str) -> bool:
 
         """Быстрая проверка пароля."""
 
@@ -53,7 +28,7 @@ class PasswordValidator:
 
         for match in self.potential_password_regex.finditer(text):
             password = match.group()
-            if self.is_strong_password(password):
+            if self.validate_password(password):
                 strong_passwords.append(password)
 
         return strong_passwords
@@ -86,17 +61,15 @@ def main():
         print("4. Выход")
         print("-" * 50)
 
-        choice = input("Выберите опцию (1-5): ").strip()
+        choice = input("Выберите опцию (1-4): ").strip()
 
         if choice == '1':
             password = input("Введите пароль для проверки: ")
-            is_valid, errors = validator.validate_password(password)
+            is_valid = validator.validate_password(password)
             if is_valid:
                 print(f"Пароль '{password}' НАДЕЖНЫЙ!")
             else:
                 print(f"Пароль '{password}' НЕНАДЕЖНЫЙ:")
-                for error in errors:
-                    print(f"   - {error}")
 
         elif choice == '2':
             text = input("Введите текст для анализа: ")
